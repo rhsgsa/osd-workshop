@@ -1,0 +1,19 @@
+#!/bin/bash
+
+cd $(dirname $0)
+BASE=$(pwd)
+cd - >> /dev/null
+
+source ${BASE}/../config.sh
+
+POD="$(oc get -n $HR_PROJECT po -l app=hosted-workshop,class=session -o name)"
+
+if [ -z "$POD" ]; then
+  echo "could not get pod"
+  exit 1
+fi
+
+set -e
+
+cd ${BASE}/../workshop_content
+tar -cf - workshop | oc rsh -n $HR_PROJECT $POD tar -xvf -

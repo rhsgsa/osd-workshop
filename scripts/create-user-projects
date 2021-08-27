@@ -1,0 +1,51 @@
+#!/bin/bash
+
+# This script
+# * creates 2 new projects for each user
+# * assigns the user as admin for that project
+# * adds the user to the cluster-monitoring-view cluster role
+
+cd $(dirname $0)
+BASE=$(pwd)
+cd - >> /dev/null
+
+source ${BASE}/../config.sh
+
+cat <<EOF > /tmp/cluster-monitoring-view.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: cluster-monitoring-view
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-monitoring-view
+subjects:
+EOF
+
+function create_project_for_user() {
+  local PROJ="$1"
+  local USER="$2"
+
+  oc new-project $PROJ
+  oc adm policy add-role-to-user admin $USER -n $PROJ
+}
+
+u=1 \
+&& \
+while [ $u -le $USERCOUNT ]; do
+  USER="user${u}"
+  echo "creating project for ${USER}..."
+
+  create_project_for_user "${USER}-ostoy" ${USER}
+  create_project_for_user "${USER}-ostoy-s2i" ${USER}
+
+  echo "- apiGroup: rbac.authorization.k8s.io" >> /tmp/cluster-monitoring-view.yaml
+  echo "  kind: User" >> /tmp/cluster-monitoring-view.yaml
+  echo "  name: ${USER}" >> /tmp/cluster-monitoring-view.yaml
+
+  u=$(( $u + 1))
+done
+
+oc apply -f /tmp/cluster-monitoring-view.yaml
+rm -f /tmp/cluster-monitoring-view.yaml

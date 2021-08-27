@@ -1,0 +1,21 @@
+#!/bin/bash
+
+cd $(dirname $0)
+BASE=$(pwd)
+cd - >> /dev/null
+
+source ${BASE}/../config.sh
+
+u=1 \
+&& \
+while [ $u -le $USERCOUNT ]; do
+  USER="user${u}"
+  echo "deleting project for ${USER}..."
+
+  oc delete project ${USER}-ostoy 2>/dev/null
+  oc delete project ${USER}-ostoy-s2i 2>/dev/null
+
+  u=$(( $u + 1 ))
+done
+
+oc delete clusterrolebinding/cluster-monitoring-view

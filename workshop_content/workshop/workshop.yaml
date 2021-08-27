@@ -1,0 +1,18 @@
+name: Openshift Dedicated Workshop
+
+modules:
+  activate:
+  - index
+  - 1-prereqs
+  - 2-concepts
+  - 3-lab_overview
+  - 4-deployment
+  - 5-healthcheck
+  - 6-storage
+  - 7-confsecenv
+  - 8-networking
+  - 9-logging
+  - 10-deployment_s2i
+  - 11-cicd_s2i
+  - 12-hpa
+  - feedback

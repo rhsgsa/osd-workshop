@@ -1,0 +1,35 @@
+config:
+  vars:
+  - name: API_URL
+    value: undefined
+
+modules:
+  index:
+    name: Introduction
+  1-prereqs:
+    name: Prerequisites
+  2-concepts:
+    name: Basic Concepts
+  3-lab_overview:
+    name: Lab Overview
+  4-deployment:
+    name: Deploy via a Kubernetes Deployment
+  5-healthcheck:
+    name: Health Checks
+  6-storage:
+    name: Persistent Volumes
+  7-confsecenv:
+    name: ConfigMaps, Secrets and Environment Variables
+  8-networking:
+    name: Networking and Scaling
+  9-logging:
+    name: Logging
+  10-deployment_s2i:
+    name: Using S2I to build and deploy our application
+  11-cicd_s2i:
+    name: Leveraging Source-to-Image (S2I) webhooks for automated deployment
+  12-hpa:
+    name: Autoscaling
+  feedback:
+    name: Feedback
+    exit_sign: Finish Workshop

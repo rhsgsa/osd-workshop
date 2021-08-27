@@ -1,0 +1,48 @@
+#!/bin/bash
+
+PROJECT=infra
+
+cd `dirname $0`
+BASE=`pwd`
+cd - >> /dev/null
+
+source ${BASE}/../config.sh
+
+set -e
+
+oc new-project $HR_PROJECT || oc project $HR_PROJECT
+
+oc new-build \
+  -n $HR_PROJECT \
+  --name=homeroom \
+  --binary \
+  --docker-image=ghcr.io/kwkoo/workshop-dashboard:4.7
+
+echo -n "waiting for buildconfig to appear..."
+while [ $(oc get bc/homeroom --no-headers 2>/dev/null | wc -l) -lt 1 ]; do
+  echo -n "."
+  sleep 5
+done
+echo "done"
+
+echo -n "waiting for workshop-dashboard imagestream tag to appear..."
+while [ $(oc get -n $HR_PROJECT istag/workshop-dashboard:4.7 -o name 2>/dev/null | wc -l) -lt 1 ]; do
+  echo -n "."
+  sleep 5
+done
+echo "done"
+
+oc start-build homeroom \
+  -n $HR_PROJECT \
+  --from-dir=${BASE}/../workshop_content \
+  --follow
+
+oc new-app \
+  -n $HR_PROJECT \
+  https://raw.githubusercontent.com/openshift-homeroom/workshop-spawner/develop/templates/hosted-workshop-production.json \
+  -p CONSOLE_IMAGE=quay.io/openshift/origin-console:4.6 \
+  -p SPAWNER_NAMESPACE=$HR_PROJECT \
+  -p CLUSTER_SUBDOMAIN=$(oc get route -n openshift-console console -o jsonpath='{.spec.host}' | sed -e 's/^[^.]*\.//') \
+  -p WORKSHOP_ENVVARS="API_URL=$(oc whoami --show-server)" \
+  -p WORKSHOP_IMAGE=homeroom:latest
+

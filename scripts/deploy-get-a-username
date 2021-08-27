@@ -1,0 +1,66 @@
+#!/bin/bash
+
+cd $(dirname $0)
+BASE=$(pwd)
+cd - >> /dev/null
+
+source ${BASE}/../config.sh
+
+
+function ensure_set {
+	local varName="$1"
+	if [ -z "${!varName}" ]; then
+		echo "$varName is not set"
+		exit 1
+	fi
+}
+
+ensure_set USERCOUNT
+ensure_set HR_PROJECT
+ensure_set GAU_PROJECT
+oc project $GAU_PROJECT || oc new-project $GAU_PROJECT
+
+HR_ROUTE="https://$(oc get -n $HR_PROJECT route/hosted-workshop-spawner -o jsonpath='{.spec.host}')"
+CONSOLE_ROUTE="https://$(oc get -n openshift-console route/console -o jsonpath='{.spec.host}')"
+
+ensure_set HR_ROUTE
+ensure_set CONSOLE_ROUTE
+
+set -e
+
+oc new-app \
+  -n $GAU_PROJECT \
+  --name=redis \
+  --template=redis-persistent \
+  -p MEMORY_LIMIT=1Gi \
+  -p DATABASE_SERVICE_NAME=redis \
+  -p REDIS_PASSWORD=redis \
+  -p VOLUME_CAPACITY=1Gi \
+  -p REDIS_VERSION=5
+
+oc new-app \
+  quay.io/openshiftlabs/username-distribution \
+  -n $GAU_PROJECT \
+  --name=get-a-username \
+  -e LAB_REDIS_HOST=redis \
+  -e LAB_REDIS_PASS=redis \
+  -e LAB_TITLE="OpenShift Dedicated Workshop" \
+  -e LAB_DURATION_HOURS=240h \
+  -e LAB_USER_COUNT=$USERCOUNT \
+  -e LAB_USER_ACCESS_TOKEN="$GAU_ACCESS_TOKEN" \
+  -e LAB_USER_PASS=openshift \
+  -e LAB_USER_PREFIX=user \
+  -e LAB_USER_PAD_ZERO=false \
+  -e LAB_ADMIN_PASS="$GAU_ADMIN_PASSWORD" \
+  -e LAB_MODULE_URLS="$HR_ROUTE;Lab" \
+  -e LAB_EXTRA_URLS="${CONSOLE_ROUTE};OpenShift Console,https://$(oc get route/grafana -n openshift-monitoring -o jsonpath='{.spec.host}');Grafana"
+
+oc expose -n $GAU_PROJECT svc/get-a-username
+oc patch route/get-a-username -n $GAU_PROJECT -p '{"spec":{"tls":{"termination":"edge","insecureEdgeTerminationPolicy":"Allow"}}}'
+
+# for the topology view
+oc label -n $GAU_PROJECT deploy/get-a-username app.kubernetes.io/part-of=get-a-username
+oc label -n $GAU_PROJECT dc/redis app.kubernetes.io/part-of=get-a-username
+oc annotate -n $GAU_PROJECT deploy/get-a-username app.openshift.io/connects-to='[{"apiVersion":"apps.openshift.io/v1","kind":"DeploymentConfig","name":"redis"}]'
+
+echo "Username app is now available at https://$(oc get -n $GAU_PROJECT route/get-a-username -o jsonpath='{.spec.host}')"

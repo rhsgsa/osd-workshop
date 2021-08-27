@@ -1,0 +1,21 @@
+#!/bin/bash
+
+cd `dirname $0`
+BASE=`pwd`
+cd - >> /dev/null
+
+source ${BASE}/../config.sh
+
+oc delete all -n $HR_PROJECT -l app=hosted-workshop 2>/dev/null
+oc delete oauthclient/hosted-workshop-console
+
+oc delete -n $HR_PROJECT bc/homeroom 2>/dev/null
+oc delete -n $HR_PROJECT is/homeroom 2>/dev/null
+oc delete -n $HR_PROJECT is/workshop-dashboard 2>/dev/null
+oc delete -n $HR_PROJECT pvc/hosted-workshop-spawner-data 2>/dev/null
+oc delete -n $HR_PROJECT sa,cm,secret,rolebindings -l app=hosted-workshop 2>/dev/null
+
+if [ $(oc get all -n $HR_PROJECT --no-headers 2>/dev/null | wc -l) -eq 0 ]; then
+  oc delete project $HR_PROJECT
+  oc project openshift
+fi
