@@ -37,23 +37,6 @@ A project called `%username%-ostoy` has been created for you. Select the project
 oc project %username%-ostoy
 ```
 
-You should receive the following response
-
-```shell
-$ oc new-project %username%-ostoy
-Now using project "%username%-ostoy" on server "https://api.osd4-demo.abc1.p1.openshiftapps.com:6443".
-
-You can add applications to this project with the 'new-app' command. For example, try:
-
-    oc new-app centos/ruby-25-centos7~https://github.com/sclorg/ruby-ex.git
-
-to build a new example application in Ruby.
-```
-
-Equivalently you can also create this new project using the web UI by clicking on "Create Project" button on the left.
-
-![UI Create Project](images/4-createnewproj.png)
-
 #### 3. Download the YAML configuration
 
 Download the Kubernetes deployment object yamls

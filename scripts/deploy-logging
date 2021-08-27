@@ -1,0 +1,124 @@
+#!/bin/bash
+
+cat <<EOF | oc apply -f -
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: openshift-operators-redhat
+  annotations:
+    openshift.io/node-selector: ""
+  labels:
+    openshift.io/cluster-monitoring: "true"
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: openshift-logging
+  annotations:
+    openshift.io/node-selector: ""
+  labels:
+    openshift.io/cluster-monitoring: "true"
+---
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+  name: openshift-operators-redhat
+  namespace: openshift-operators-redhat
+spec: {}
+---
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: "elasticsearch-operator"
+  namespace: "openshift-operators-redhat"
+spec:
+  channel: "stable-5.1"
+  installPlanApproval: "Automatic"
+  source: "redhat-operators"
+  sourceNamespace: "openshift-marketplace"
+  name: "elasticsearch-operator"
+---
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+  name: cluster-logging
+  namespace: openshift-logging
+spec:
+  targetNamespaces:
+  - openshift-logging
+---
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: cluster-logging
+  namespace: openshift-logging
+spec:
+  channel: "stable"
+  name: cluster-logging
+  source: redhat-operators
+  sourceNamespace: openshift-marketplace
+EOF
+
+echo -n "waiting for ClusterLogging api resource..."
+while [ $(oc api-resources | grep '^clusterloggings' | wc -l) -lt 1 ]; do
+  echo -n "."
+  sleep 10
+done
+echo "done"
+
+cat << EOF | oc apply -f -
+apiVersion: "logging.openshift.io/v1"
+kind: "ClusterLogging"
+metadata:
+  name: "instance"
+  namespace: "openshift-logging"
+spec:
+  managementState: "Managed"
+  logStore:
+    type: "elasticsearch"
+    retentionPolicy:
+      application:
+        maxAge: 1d
+      infra:
+        maxAge: 7d
+      audit:
+        maxAge: 7d
+    elasticsearch:
+      nodeCount: 3
+      storage:
+        storageClassName: "gp2"
+        size: 200G
+      resources:
+        requests:
+          memory: "8Gi"
+      proxy:
+        resources:
+          limits:
+            memory: 256Mi
+          requests:
+             memory: 256Mi
+      redundancyPolicy: "SingleRedundancy"
+  visualization:
+    type: "kibana"
+    kibana:
+      replicas: 1
+  collection:
+    logs:
+      type: "fluentd"
+      fluentd: {}
+EOF
+
+echo -n "waiting for kibana pod to appear..."
+while [ $(oc get po -n openshift-logging -l component=kibana --no-headers | wc -l) -lt 1 ]; do
+  echo "."
+  sleep 10
+done
+echo "done"
+
+POD="$(oc get po -n openshift-logging -l component=kibana -o name)"
+
+set -e
+oc wait -n openshift-logging --for=condition=ready --timeout=120s $POD
+
+# create an index pattern in kibana for this admin user
+oc rsh -n openshift-logging $POD curl -v -X POST --header "Authorization: Bearer $(oc whoami -t)" --header 'Content-Type: application/json' --header 'kbn-xsrf: this_is_required_header' -d '{"attributes":{"title":"app","timeFieldName":"@timestamp"}}' localhost:5601/api/saved_objects/index-pattern/index-pattern-id

@@ -5,6 +5,7 @@ BASE:=$(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 .PHONY: deploy clean image homeroom gau
 
 deploy:
+	@$(BASE)/scripts/deploy-logging
 	@$(BASE)/scripts/create-user-projects
 	@$(BASE)/scripts/deploy-homeroom
 	@$(BASE)/scripts/deploy-get-a-username
