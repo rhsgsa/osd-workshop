@@ -109,7 +109,7 @@ spec:
 EOF
 
 echo -n "waiting for kibana pod to appear..."
-while [ $(oc get po -n openshift-logging -l component=kibana --no-headers | wc -l) -lt 1 ]; do
+while [ $(oc get po -n openshift-logging -l component=kibana --no-headers 2>/dev/null | wc -l) -lt 1 ]; do
   echo "."
   sleep 10
 done
