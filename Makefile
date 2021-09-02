@@ -15,6 +15,7 @@ clean:
 	-@$(BASE)/scripts/clean-user-projects
 	-@$(BASE)/scripts/clean-get-a-username
 	-@$(BASE)/scripts/clean-homeroom
+	-@$(BASE)/scripts/clean-logging
 
 # downloads version 4.7 of the oc cli
 image:

@@ -1,0 +1,27 @@
+#!/bin/bash
+
+oc delete -n openshift-logging clusterlogging/instance 2>/dev/null
+
+echo -n "waiting for all pods to terminate..."
+# 1 pod for the operator
+while [ $(oc get po -n openshift-logging --no-headers 2>/dev/null | wc -l)  -gt 1 ]; do
+  echo -n "."
+  sleep 10
+done
+echo "done"
+
+for pvc in $(oc get pvc -o name -n openshift-logging 2>/dev/null); do
+  oc delete $pvc -n openshift-logging
+done
+
+oc delete ns openshift-logging 2>/dev/null
+
+oc delete subscription elasticsearch-operator -n openshift-operators-redhat 2>/dev/null
+oc delete operatorgroup openshift-operators-redhat -n openshift-operators-redhat 2>/dev/null
+oc delete ns openshift-operators-redhat 2>/dev/null
+
+for crd in $(oc api-resources --api-group=logging.openshift.io -o name 2>/dev/null); do
+  oc delete crd $crd
+done
+
+exit 0
