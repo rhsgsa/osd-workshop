@@ -129,6 +129,8 @@ ostoy-route   ostoy-route-%username%-ostoy.apps.osd4-demo.abc1.p1.openshiftapps.
 
 #### 7. View the app
 
-Click on this link to access the application: <http://ostoy-route-%username%-ostoy.%cluster_subdomain%>.  You should see the homepage of our application.
+Click on this link to access the application: <http://ostoy-route-%username%-ostoy.%cluster_subdomain%>. You should see the homepage of our application. If you don't see the homepage of the application, you may need to wait a couple of minutes for the app to start.
 
 ![Home Page](images/4-ostoy-homepage.png)
+
+Keep this page open for use in later exercises.

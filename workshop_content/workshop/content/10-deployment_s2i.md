@@ -1,10 +1,5 @@
 There are multiple methods to deploy applications in OpenShift. Let's explore using the integrated Source-to-Image (S2I) builder. As mentioned in the [concepts](2-concepts.md) section, S2I is a tool for building reproducible, Docker-formatted container images. 
 
-#### 0. Retrieve the login command (if not logged in via CLI)
-If not logged in via the CLI, click on the dropdown arrow next to your name in the top-right of the cluster console and select *Copy Login Command*.
-
-Follow the steps from [Step 1](4-deployment.md#1-retrieve-the-login-command) of the Deployment section.
-
 #### 1. Fork the repository
 In the next section we will trigger automated builds based on changes to the source code. In order to trigger S2I builds when you push code into your GitHub repo, you’ll need to setup the GitHub webhook.  And in order to setup the webhook, you’ll first need to fork the application into your personal GitHub repository.
 
@@ -22,35 +17,57 @@ oc project %username%-ostoy-s2i
 
 ### Steps to Deploy OSToy imperatively using S2I
 
-#### 3. Add Secret to OpenShift
+#### 3. Set the `GIT_USER` environment variable to your github username in the terminal 
+
+Enter the following into the terminal (please replace **`REPLACE_ME`** with your actual github username):
+
+```copy
+GIT_USER=REPLACE_ME
+```
+
+#### 4. Add Secret to OpenShift
 The example emulates a `.env` file and shows how easy it is to move these directly into an OpenShift environment. Files can even be renamed in the Secret.  In your CLI enter the following command:
 
-```shell
-$ oc create -f https://raw.githubusercontent.com/<username>/ostoy/master/deployment/yaml/secret.yaml
+```execute
+oc create -f https://raw.githubusercontent.com/${GIT_USER}/ostoy/master/deployment/yaml/secret.yaml
+```
 
+You should see the following:
+
+```shell
 secret "ostoy-secret" created
 ```
 
-#### 4. Add ConfigMap to OpenShift
+#### 5. Add ConfigMap to OpenShift
 The example emulates an HAProxy config file, and is typically used for overriding default configurations in an OpenShift application. Files can even be renamed in the ConfigMap.
 
-Enter the following into your CLI 
-```shell
-$ oc create -f https://raw.githubusercontent.com/<username>/ostoy/master/deployment/yaml/configmap.yaml
+Enter the following into your CLI
 
+```execute
+oc create -f https://raw.githubusercontent.com/${GIT_USER}/ostoy/master/deployment/yaml/configmap.yaml
+```
+
+You should see the following:
+
+```shell
 configmap "ostoy-config" created
 ```
 
-#### 5. Deploy the microservice
+#### 6. Deploy the microservice
 We deploy the microservice first to ensure that the SERVICE environment variables will be available from the UI application. `--context-dir` is used here to only build the application defined in the `microservice` directory in the git repo. Using the `app` label allows us to ensure the UI application and microservice are both grouped in the OpenShift UI.  
 
 Enter the following into the CLI
-```shell
-$ oc new-app https://github.com/<username>/ostoy \
-    --context-dir=microservice \
-    --name=ostoy-microservice \
-    --labels=app=ostoy
 
+```execute
+oc new-app https://github.com/${GIT_USER}/ostoy \
+  --context-dir=microservice \
+  --name=ostoy-microservice \
+  --labels=app=ostoy
+```
+
+You should see the following:
+
+```shell
 Creating resources with label app=ostoy ...
   imagestream "ostoy-microservice" created
   buildconfig "ostoy-microservice" created
@@ -63,7 +80,7 @@ Success
   Run 'oc status' to view your app.
 ```
 
-#### 6. Check the status of the microservice
+#### 7. Check the status of the microservice
 Before moving onto the next step we should be sure that the microservice was created and is running correctly.  To do this run:
 
 ```execute
@@ -81,14 +98,18 @@ svc/ostoy-microservice - 172.30.119.88:8080
 
 Wait until you see that it was successfully deployed. You can also check this through the web UI.
 
-#### 7. Deploy the frontend UI of the application
+#### 8. Deploy the frontend UI of the application
 
 The application has been architected to rely on several environment variables to define external settings. We will attach the previously created Secret and ConfigMap afterward, along with creating a PersistentVolume.  Enter the following into the CLI:
 
-```shell
-$ oc new-app https://github.com/<username>/ostoy \
-    --env=MICROSERVICE_NAME=OSTOY_MICROSERVICE
+```execute
+oc new-app https://github.com/${GIT_USER}/ostoy \
+  --env=MICROSERVICE_NAME=OSTOY_MICROSERVICE
+```
 
+You should see the following:
+
+```shell
 Creating resources ...
   imagestream "ostoy" created
   buildconfig "ostoy" created
@@ -101,7 +122,7 @@ Success
   Run 'oc status' to view your app.
 ```
 
-#### 8. Update the Deployment 
+#### 9. Update the Deployment 
 
 We need to update the deployment to use a "Recreate" deployment strategy (as opposed to the default of `RollingUpdate` for consistent deployments with persistent volumes. Reasoning here is that the PV is backed by EBS and as such only supports the `RWO` method.  If the deployment is updated without all existing pods being killed it may not be able to schedule a new pod and create a PVC for the PV as it's still bound to the existing pod.
 
@@ -115,7 +136,7 @@ oc patch deploy/ostoy \
 deployment.apps/ostoy patched
 ```
 
-#### 9. Set a Liveness probe
+#### 10. Set a Liveness probe
 
 We need to create a Liveness Probe on the Deployment to ensure the pod is restarted if something isn't healthy within the application.  Enter the following into the CLI:
 
@@ -127,7 +148,7 @@ oc set probe deploy/ostoy --liveness --get-url=http://:8080/health
 deployment.apps/ostoy probes updated
 ```
 
-#### 10. Attach Secret, ConfigMap, and PersistentVolume to Deployment
+#### 11. Attach Secret, ConfigMap, and PersistentVolume to Deployment
 
 We are using the default paths defined in the application, but these paths can be overridden in the application via environment variables
 
@@ -173,7 +194,7 @@ info: Generated volume name: volume-rlbvv
 deployment.apps/ostoy volume updated
 ```
 
-#### 11. Expose the UI application as an OpenShift Route
+#### 12. Expose the UI application as an OpenShift Route
 Using OpenShift Dedicated's included TLS wildcard certificates, we can easily deploy this as an HTTPS application
 
 ```execute
@@ -190,6 +211,9 @@ Get the host of the route that was just created:
 oc get route/ostoy
 ```
 
-#### 12. Browse to your application
+#### 13. Browse to your application
 
 Open a browser to the URL specified by the route: <https://ostoy-%username%-ostoy-s2i.%cluster_subdomain%>
+
+<!-- Place this tag in your head or just before your close body tag. -->
+<script async defer src="https://buttons.github.io/buttons.js"></script>

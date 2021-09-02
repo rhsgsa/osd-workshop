@@ -59,7 +59,7 @@ ostoy-microservice-86b4c6f559-p594d   1/1       Running   0          1h
 #### 5. Scale pods via Deployment definition
 Let's change our microservice definition yaml to reflect that we want 3 pods instead of the one we see. Download the [ostoy-microservice-deployment.yaml](https://raw.githubusercontent.com/openshift-cs/osdworkshop/master/OSD4/yaml/ostoy-microservice-deployment.yaml) and save it on your local machine, if you didn't do so already.
 
-- Open the file using your favorite editor.
+- Open the file using your favorite editor. If you don't know what `vi` is, you should use `nano`.
 
 ```execute
 nano ~/ostoy-microservice-deployment.yaml

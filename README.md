@@ -29,6 +29,9 @@ Once everything has been deployed, you can
 
 * run `make gau` to open a browser to get-a-username
 
+	* The password in get-a-username is defined as `GAU_ACCESS_TOKEN` in `config.sh`
+	* If you wish to access the admin UI, go to the `/admin` URI - the admin password is defined as `GAU_ADMIN_PASSWORD` in `config.sh`
+
 
 ## Uninstall
 
