@@ -80,12 +80,12 @@ Now we will make a change in our source code and see it automatically trigger a 
 
 #### 6. View the build run and Deployment complete
 
-Immediately, in your cluster web UI, click under *Builds > Builds* and you will see that it says "running" then it will show "complete".  Once complete the deployment begins.  You can also check the status by running `oc status`.  
+Immediately, in your cluster web UI, select the `%username%-ostoy-s2i` project, click under *Builds > Builds* and you will see that it says "running" then it will show "complete".  Once complete the deployment begins.  You can also check the status by running `oc status`.  
 
 ![Build Run](images/11-builddone.png)
 
 #### 7. View change in browser
 
-Once the deployment has finished go back to OSToy app in your browser, access the *Networking* menu item on the left.  You will now see that the box color is limited to greyscale colors only.
+Once the deployment has finished go back to [OSToy app](https://ostoy-%username%-s2i.%cluster_subdomain%) in your browser, access the *Networking* menu item on the left.  You will now see that the box color is limited to greyscale colors only.
 
 ![Grey](images/11-grey.png)
