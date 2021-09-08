@@ -38,6 +38,13 @@ Now let's confirm that it's actually there by using the CLI and checking if it i
 oc get pods
 ```
 
+Keep checking the status of the pod (`oc get pods`) till you see the `ostoy-frontend-*` pod in a ready state (the `READY` field set to `1/1`):
+
+```shell
+NAME                                 READY   STATUS    RESTARTS   AGE
+ostoy-frontend-64b8f6cf9d-s2x7d      1/1     Running   3          10m
+```
+
 then get an SSH session into the container
 
 ```execute
