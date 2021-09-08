@@ -31,7 +31,11 @@ spec:
     app: ostoy-microservice
 ```
 
-In this case we will enter: `ostoy-microservice-svc.%username%-ostoy.svc.cluster.local`
+In this case we will enter:
+
+```copy
+ostoy-microservice-svc.%username%-ostoy.svc.cluster.local
+```
 
 #### 3. IP address returned
 We will see an IP address returned. In our example it is `172.30.165.246`.  This is the intra-cluster IP address; only accessible from within the cluster.
