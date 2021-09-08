@@ -58,7 +58,7 @@ Copy the generated URL to your clipboard. You will need it in the next step.
 
 ![Add Webhook](images/11-webhook.png)
 
-- Paste the URL from step 4 into the "Payload URL" field
+- Paste the URL from step 4 into the "Payload URL" field (please ensure that the URL does not contain any spaces)
 - Change the "Content type" to `application/json`
 - Disable SSL verification (this is required because Github does not recognize the cluster API server's certificate)
 - Click add webhook at the bottom
