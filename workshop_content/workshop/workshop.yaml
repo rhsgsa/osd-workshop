@@ -12,7 +12,7 @@ modules:
   - 7-confsecenv
   - 8-networking
   - 9-logging
-  - 10-deployment_s2i
-  - 11-cicd_s2i
-  - 12-hpa
+  - 10-hpa
+  - 11-deployment_s2i
+  - 12-cicd_s2i
   - feedback

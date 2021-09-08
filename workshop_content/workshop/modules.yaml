@@ -24,12 +24,12 @@ modules:
     name: Networking and Scaling
   9-logging:
     name: Logging
-  10-deployment_s2i:
-    name: Using S2I to build and deploy our application
-  11-cicd_s2i:
-    name: Leveraging Source-to-Image (S2I) webhooks for automated deployment
-  12-hpa:
+  10-hpa:
     name: Autoscaling
+  11-deployment_s2i:
+    name: Using S2I to build and deploy our application
+  12-cicd_s2i:
+    name: Leveraging Source-to-Image (S2I) webhooks for automated deployment
   feedback:
     name: Feedback
     exit_sign: Finish Workshop
