@@ -86,6 +86,6 @@ Immediately, in your cluster web UI, select the `%username%-ostoy-s2i` project, 
 
 #### 7. View change in browser
 
-Once the deployment has finished go back to [OSToy app](https://ostoy-%username%-s2i.%cluster_subdomain%) in your browser, access the *Networking* menu item on the left.  You will now see that the box color is limited to greyscale colors only.
+Once the deployment has finished go back to [OSToy app](https://ostoy-%username%-ostoy-s2i.%cluster_subdomain%) in your browser, access the *Networking* menu item on the left.  You will now see that the box color is limited to greyscale colors only.
 
 ![Grey](images/11-grey.png)
