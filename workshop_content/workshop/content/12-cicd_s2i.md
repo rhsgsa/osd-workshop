@@ -71,7 +71,7 @@ You should see a message from GitHub stating that your webhook was successfully 
 
 Now we will make a change in our source code and see it automatically trigger a build and deployment.  We saw in our Networking section that the colors of the box randomly change colors.  Now we will make that box only display greyscale.
 
-- Go to the source code in your repository `https://github.com/<username>/ostoy/blob/master/microservice/app.js`
+- Go to the source code in your repository `https://github.com/<username>/ostoy/blob/master/microservice/app.js` (remember to substitute `<username>` with your Github username)
 - Edit the file
 - Comment out line 8 (containing `let randomColor = getRandomColor();`)
 - Uncomment line 9 (containing `let randomColor = getRandomGrayScaleColor();`)

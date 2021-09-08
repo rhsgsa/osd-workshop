@@ -5,7 +5,7 @@ In the next section we will trigger automated builds based on changes to the sou
 
 <a class="github-button" href="https://github.com/openshift-cs/ostoy/fork" data-icon="octicon-repo-forked" data-size="large" aria-label="Fork openshift-cs/ostoy on GitHub">Fork</a>
 
-> **NOTE:** Going forward you will need to replace any reference to "< username >" in any of the URLs for commands with your own username.  So in this example I would always replace "< username >" with "0kashi".
+> **NOTE:** Going forward you will need to replace any reference to "< username >" in any of the URLs for commands with your own Github username.  So in this example I would always replace "< username >" with "0kashi".
 
 #### 2. Switch project
 
