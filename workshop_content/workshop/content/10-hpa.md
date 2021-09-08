@@ -5,14 +5,6 @@ As defined in the Kubernetes documentation:
 
 We will create an HPA and then use OSToy to generate CPU intensive workloads.  We will then observe how the HPA will scale up the number of pods in order to handle the increased workloads.
 
-#### 0. Switch project
-
-Before we start, we should switch back to the original project:
-
-```execute
-oc project %username%-ostoy
-```
-
 #### 1. Create the Horizontal Pod Autoscaler
 
 Run the following command to create the autoscaler. This will create an HPA that maintains between 1 and 10 replicas of the Pods controlled by the *ostoy-microservice* Deployment created. Roughly speaking, the HPA will increase and decrease the number of replicas (via the deployment) to maintain an average CPU utilization across all Pods of 80% (since each pod requests 50 millicores, this means average CPU usage of 40 millicores)
