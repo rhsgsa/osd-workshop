@@ -80,6 +80,12 @@ Success
   Run 'oc status' to view your app.
 ```
 
+Enter the following to monitor the status of the build
+
+```execute
+oc logs -f buildconfig/ostoy-microservice
+```
+
 #### 7. Check the status of the microservice
 Before moving onto the next step we should be sure that the microservice was created and is running correctly.  To do this run:
 
@@ -120,6 +126,12 @@ Success
   Application is not exposed. You can expose services to the outside world by executing one or more of the commands below:
    'oc expose svc/ostoy'
   Run 'oc status' to view your app.
+```
+
+Enter the following to monitor the status of the build
+
+```execute
+oc logs -f buildconfig/ostoy
 ```
 
 #### 9. Update the Deployment 
